@@ -21,20 +21,21 @@ data class User(
     val name: String,
     @Column(unique = true)
     val email: String,
+    val userPassword: String,
     @CreatedDate
     val created: LocalDateTime,
     @LastModifiedDate
     val updated: LocalDateTime
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        TODO("Not yet implemented")
+        return mutableListOf()
     }
 
     override fun getPassword(): String {
-        TODO("Not yet implemented")
+        return userPassword
     }
 
     override fun getUsername(): String {
-        return name
+        return email
     }
 }
