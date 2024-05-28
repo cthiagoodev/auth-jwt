@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import java.security.Key
 import java.util.Date
+import javax.crypto.SecretKey
 
 class JwtService {
     @Value("app.jwt-secret")
-    private lateinit var secretKey: String
+    private lateinit var secretKey: SecretKey
     @Value("app.jwt-expiration-milliseconds")
     private var expiration: Long = 0
 
@@ -35,8 +36,22 @@ class JwtService {
             .compact()
     }
 
+    private fun <T> extractClaim(token: String, claimsResolver: () -> Unit): () -> T {
+        val claims: Claims = extractAllClaims(token)
+        return claimsResolver.apply(claims)
+    }
+
+    private fun extractAllClaims(token: String): Claims {
+         return Jwts
+            .parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(token)
+            .payload
+    }
+
     private fun getSignInKey(): Key {
-        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey)
+        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey.toString())
         return Keys.hmacShaKeyFor(keyBytes)
     }
 }
