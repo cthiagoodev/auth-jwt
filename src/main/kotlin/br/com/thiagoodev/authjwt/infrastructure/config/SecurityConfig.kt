@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -31,5 +34,20 @@ class SecurityConfig(
             }
 
         return http.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val config: CorsConfiguration = CorsConfiguration()
+
+        config.allowedOrigins = listOf("http://localhost:8000")
+        config.allowedMethods = listOf("GET", "POST")
+        config.allowedHeaders = listOf("Authorizations", "Content-Type")
+
+        val source = UrlBasedCorsConfigurationSource()
+
+        source.registerCorsConfiguration("/**", config);
+
+        return source
     }
 }
