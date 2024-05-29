@@ -17,15 +17,15 @@ import java.time.LocalDateTime
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val uuid: String,
-    val name: String,
+    val uuid: String = "",
+    val name: String = "",
     @Column(unique = true)
-    val email: String,
-    val userPassword: String,
+    val email: String = "",
+    val userPassword: String = "",
     @CreatedDate
-    val created: LocalDateTime,
+    val created: LocalDateTime = LocalDateTime.now(),
     @LastModifiedDate
-    val updated: LocalDateTime
+    val updated: LocalDateTime = LocalDateTime.now()
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf()
