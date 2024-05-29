@@ -7,7 +7,7 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import java.security.Key
-import java.util.Date
+import java.util.*
 import javax.crypto.SecretKey
 
 class JwtService {
@@ -16,11 +16,11 @@ class JwtService {
     @Value("app.jwt-expiration-milliseconds")
     private var expiration: Long = 0
 
+    fun getExpiration(): Long = expiration
+
     fun generateToken(details: UserDetails): String {
         return buildToken(emptyMap(), details, expiration)
     }
-
-    fun getExpiration(): Long = expiration
 
     private fun buildToken(
         extraClaims: Map<String, Any>,
@@ -36,9 +36,31 @@ class JwtService {
             .compact()
     }
 
-    private fun <T> extractClaim(token: String, claimsResolver: () -> Unit): () -> T {
-        val claims: Claims = extractAllClaims(token)
-        return claimsResolver.apply(claims)
+    private fun getSignInKey(): Key {
+        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey.toString())
+        return Keys.hmacShaKeyFor(keyBytes)
+    }
+
+    fun isTokenValid(token: String, details: UserDetails): Boolean {
+        val username: String = extractUsername(token)
+        return username == details.username && !isTokenExpired(token)
+    }
+
+    private fun extractUsername(token: String): String {
+        return extractClaim(token, Claims::getSubject)
+    }
+
+    private fun isTokenExpired(token: String): Boolean {
+        return extractExpiration(token).before(Date())
+    }
+
+    private fun extractExpiration(token: String): Date {
+        return extractClaim(token, Claims::getExpiration)
+    }
+
+    private fun <T> extractClaim(token: String?, claimsResolver: (Claims) -> T): T {
+        val claims = extractAllClaims(token!!)
+        return claimsResolver(claims)
     }
 
     private fun extractAllClaims(token: String): Claims {
@@ -48,10 +70,5 @@ class JwtService {
             .build()
             .parseSignedClaims(token)
             .payload
-    }
-
-    private fun getSignInKey(): Key {
-        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey.toString())
-        return Keys.hmacShaKeyFor(keyBytes)
     }
 }
