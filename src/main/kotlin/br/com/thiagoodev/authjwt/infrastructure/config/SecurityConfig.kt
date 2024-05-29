@@ -18,22 +18,17 @@ class SecurityConfig(
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf { csrf -> csrf.disable() }
-
-        http.sessionManagement {
-            it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        }
-
         http
+            .csrf { csrf -> csrf.disable() }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-
-        http.authorizeHttpRequests {
-            it
-                .requestMatchers(HttpMethod.GET, "/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/register").permitAll()
-                .anyRequest().authenticated()
-        }
+            .authorizeHttpRequests {
+                it
+                    .requestMatchers(HttpMethod.GET, "/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/register").permitAll()
+                    .anyRequest().authenticated()
+            }
 
         return http.build()
     }
