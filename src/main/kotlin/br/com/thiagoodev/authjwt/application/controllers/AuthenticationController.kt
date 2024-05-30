@@ -1,5 +1,6 @@
 package br.com.thiagoodev.authjwt.application.controllers
 
+import br.com.thiagoodev.authjwt.application.errors.ResponseErrorMessage
 import br.com.thiagoodev.authjwt.domain.dtos.RegisterUserDTO
 import br.com.thiagoodev.authjwt.domain.entities.User
 import br.com.thiagoodev.authjwt.domain.services.AuthenticationService
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,9 +25,10 @@ class AuthenticationController(
             val registeredUser: User = authenticationService.signUp(registerDTO)
             return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser)
         } catch(error: UserAlreadyExistsException) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, error.message)
+            return ResponseErrorMessage(HttpStatus.CONFLICT, error.message).build()
         } catch(error: Exception) {
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, error.message)
+            val message: String = error.message ?: "Error creating user"
+            return ResponseErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, message).build()
         }
     }
 }
