@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.security.core.GrantedAuthority
@@ -12,27 +13,29 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
 
 @Entity
+@Table(name = "users")
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val uuid: String,
-    val name: String,
+    val uuid: String = "",
+    val name: String = "",
     @Column(unique = true)
-    val email: String,
+    val email: String = "",
+    val userPassword: String = "",
     @CreatedDate
-    val created: LocalDateTime,
+    val created: LocalDateTime = LocalDateTime.now(),
     @LastModifiedDate
-    val updated: LocalDateTime
+    val updated: LocalDateTime = LocalDateTime.now()
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        TODO("Not yet implemented")
+        return mutableListOf()
     }
 
     override fun getPassword(): String {
-        TODO("Not yet implemented")
+        return userPassword
     }
 
     override fun getUsername(): String {
-        TODO("Not yet implemented")
+        return email
     }
 }
