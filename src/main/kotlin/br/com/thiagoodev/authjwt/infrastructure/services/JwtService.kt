@@ -12,9 +12,10 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Service
-class JwtService {
+class JwtService(
+) {
     @Value("\${security.jwt.secret-key}")
-    private lateinit var secretKey: SecretKey
+    private lateinit var secretKey: String
     @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
 
@@ -66,9 +67,10 @@ class JwtService {
     }
 
     private fun extractAllClaims(token: String): Claims {
-         return Jwts
+        val key: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))
+        return Jwts
             .parser()
-            .verifyWith(secretKey)
+            .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .payload

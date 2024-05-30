@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -40,7 +39,7 @@ class JwtAuthenticationFilter(
                 val userDetails: UserDetails = userDetailsService.loadUserByUsername(userEmail)
 
                 if(jwtService.isTokenValid(jwt, userDetails)) {
-                    val authToken: UsernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
+                    val authToken = UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.authorities,
