@@ -25,9 +25,9 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val authHeader: String = request.getHeader("Authorization")
+        val authHeader: String? = request.getHeader("Authorization")
 
-        if(authHeader.isEmpty() || !authHeader.startsWith("Bearer")) {
+        if(authHeader == null || !authHeader.startsWith("Bearer")) {
             filterChain.doFilter(request, response)
             return
         }
@@ -36,9 +36,7 @@ class JwtAuthenticationFilter(
             val jwt: String = authHeader.substring(7)
             val userEmail: String = jwtService.extractUsername(jwt)
 
-            val authentication: Authentication = SecurityContextHolder.getContext().authentication
-
-            if(userEmail.isNotEmpty() && authentication.isAuthenticated) {
+            if(userEmail.isNotEmpty() && SecurityContextHolder.getContext().authentication == null) {
                 val userDetails: UserDetails = userDetailsService.loadUserByUsername(userEmail)
 
                 if(jwtService.isTokenValid(jwt, userDetails)) {

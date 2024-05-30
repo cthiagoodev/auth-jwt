@@ -13,9 +13,9 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService {
-    @Value("security.jwt.secret-key")
+    @Value("\${security.jwt.secret-key}")
     private lateinit var secretKey: SecretKey
-    @Value("security.jwt.expiration-time")
+    @Value("\${security.jwt.expiration-time}")
     private var expiration: Long = 0
 
     fun getExpiration(): Long = expiration
