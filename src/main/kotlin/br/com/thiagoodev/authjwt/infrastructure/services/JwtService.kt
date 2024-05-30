@@ -40,7 +40,7 @@ class JwtService(
     }
 
     private fun getSignInKey(): Key {
-        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey.toString())
+        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey)
         return Keys.hmacShaKeyFor(keyBytes)
     }
 
@@ -67,7 +67,7 @@ class JwtService(
     }
 
     private fun extractAllClaims(token: String): Claims {
-        val key: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))
+        val key: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(token))
         return Jwts
             .parser()
             .verifyWith(key)
