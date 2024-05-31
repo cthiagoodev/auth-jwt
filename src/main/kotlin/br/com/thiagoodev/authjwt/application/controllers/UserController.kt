@@ -20,11 +20,11 @@ class UserController(
     private val userService: UserService,
     private val jwtService: JwtService,
 ) {
-    @GetMapping("/me")
-    fun me(@RequestHeader("Authorization") authorization: String): ResponseEntity<UserDTO> {
+    @GetMapping("/details")
+    fun details(@RequestHeader("Authorization") authorization: String): ResponseEntity<UserDTO> {
         try {
             val email: String = jwtService.extractUsername(authorization)
-            val user: User = userService.me(email)
+            val user: User = userService.find(email)
             return ResponseEntity.ok(UserDTO.fromUser(user))
         } catch(error: UsernameNotFoundException) {
             val message: String = error.message ?: "User not exists"

@@ -45,7 +45,8 @@ class AuthenticationController(
             val token: String = jwtService.generateToken(user)
             val expiration: Long = jwtService.getExpiration()
             val response = JwtDTO(token, expiration)
-            return ResponseEntity.status(HttpStatus.OK).body(response)
+
+            return ResponseEntity.ok(response)
         } catch(error: UsernameNotFoundException) {
             val message: String = error.message ?: "User not exists"
             return ResponseErrorMessage(HttpStatus.NOT_FOUND, message).build()
