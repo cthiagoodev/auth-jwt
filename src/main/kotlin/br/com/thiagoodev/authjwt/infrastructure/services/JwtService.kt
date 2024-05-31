@@ -1,5 +1,6 @@
 package br.com.thiagoodev.authjwt.infrastructure.services
 
+import com.nimbusds.jose.util.Base64URL
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
@@ -40,7 +41,7 @@ class JwtService(
     }
 
     private fun getSignInKey(): Key {
-        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey)
+        val keyBytes: ByteArray = Base64URL.from(secretKey).decode()
         return Keys.hmacShaKeyFor(keyBytes)
     }
 
@@ -67,7 +68,7 @@ class JwtService(
     }
 
     private fun extractAllClaims(token: String): Claims {
-        val key: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(token))
+        val key: SecretKey = Keys.hmacShaKeyFor(Base64URL.from(token).decode())
         return Jwts
             .parser()
             .verifyWith(key)
