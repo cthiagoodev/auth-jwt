@@ -21,7 +21,7 @@ class UserController(
     @GetMapping("/me")
     fun me(@RequestHeader("Authorization") authorization: String): ResponseEntity<User> {
         try {
-            val email: String = jwtService.extractUsername(authorization)
+            val email: String = jwtService.extractUsername(authorization.substring(7))
             val user: User = userService.me(email)
             return ResponseEntity.ok(user)
         } catch(error: UsernameNotFoundException) {

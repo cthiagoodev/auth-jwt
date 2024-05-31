@@ -3,7 +3,6 @@ package br.com.thiagoodev.authjwt.infrastructure.services
 import com.nimbusds.jose.util.Base64URL
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
@@ -68,7 +67,7 @@ class JwtService(
     }
 
     private fun extractAllClaims(token: String): Claims {
-        val key: SecretKey = Keys.hmacShaKeyFor(Base64URL.from(token).decode())
+        val key: SecretKey = Keys.hmacShaKeyFor(Base64URL.from(secretKey).decode())
         return Jwts
             .parser()
             .verifyWith(key)
