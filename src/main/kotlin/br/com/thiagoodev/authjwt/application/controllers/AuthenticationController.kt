@@ -6,6 +6,7 @@ import br.com.thiagoodev.authjwt.domain.entities.User
 import br.com.thiagoodev.authjwt.domain.services.AuthenticationService
 import br.com.thiagoodev.authjwt.infrastructure.exceptions.UserAlreadyExistsException
 import br.com.thiagoodev.authjwt.infrastructure.services.JwtService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,7 +21,7 @@ class AuthenticationController(
     private val authenticationService: AuthenticationService,
 ) {
     @PostMapping("/register")
-    fun register(@RequestBody registerDTO: RegisterUserDTO): ResponseEntity<User> {
+    fun register(@Valid @RequestBody registerDTO: RegisterUserDTO): ResponseEntity<User> {
         try {
             val registeredUser: User = authenticationService.signUp(registerDTO)
             return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser)
