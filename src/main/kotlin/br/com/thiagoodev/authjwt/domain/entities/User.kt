@@ -20,7 +20,7 @@ data class User(
     @field:Column(unique = true)
     val email: String = "",
     @field:Column(name = "password")
-    val userPassword: String = "",
+    val hashedPassword: String = "",
     @field:CreatedDate
     val created: LocalDateTime = LocalDateTime.now(),
     @field:LastModifiedDate
@@ -31,7 +31,7 @@ data class User(
     }
 
     override fun getPassword(): String {
-        return userPassword
+        return hashedPassword
     }
 
     override fun getUsername(): String {

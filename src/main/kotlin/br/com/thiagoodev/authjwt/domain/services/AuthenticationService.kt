@@ -35,7 +35,7 @@ class AuthenticationService(
         val user = User(
             name = dto.fullName,
             email = dto.email,
-            userPassword = passwordEncoder.encode(dto.password)
+            hashedPassword = passwordEncoder.encode(dto.password)
         )
 
         return userRepository.save(user)
