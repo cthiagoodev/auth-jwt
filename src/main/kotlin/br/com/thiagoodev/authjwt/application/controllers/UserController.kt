@@ -1,8 +1,10 @@
 package br.com.thiagoodev.authjwt.application.controllers
 
 import br.com.thiagoodev.authjwt.application.errors.ResponseErrorMessage
+import br.com.thiagoodev.authjwt.domain.dtos.UserDTO
 import br.com.thiagoodev.authjwt.domain.entities.User
 import br.com.thiagoodev.authjwt.domain.services.UserService
+import br.com.thiagoodev.authjwt.infrastructure.extensions.fromUser
 import br.com.thiagoodev.authjwt.infrastructure.services.JwtService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -19,11 +21,11 @@ class UserController(
     private val jwtService: JwtService,
 ) {
     @GetMapping("/me")
-    fun me(@RequestHeader("Authorization") authorization: String): ResponseEntity<User> {
+    fun me(@RequestHeader("Authorization") authorization: String): ResponseEntity<UserDTO> {
         try {
-            val email: String = jwtService.extractUsername(authorization.substring(7))
+            val email: String = jwtService.extractUsername(authorization)
             val user: User = userService.me(email)
-            return ResponseEntity.ok(user)
+            return ResponseEntity.ok(UserDTO.fromUser(user))
         } catch(error: UsernameNotFoundException) {
             val message: String = error.message ?: "User not exists"
             return ResponseErrorMessage(HttpStatus.NOT_FOUND, message).build()

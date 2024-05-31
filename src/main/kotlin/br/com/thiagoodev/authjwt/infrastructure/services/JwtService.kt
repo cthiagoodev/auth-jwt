@@ -50,7 +50,7 @@ class JwtService(
     }
 
     fun extractUsername(token: String): String {
-        return extractClaim(token, Claims::getSubject)
+        return extractClaim(extractToken(token), Claims::getSubject)
     }
 
     private fun isTokenExpired(token: String): Boolean {
@@ -67,12 +67,18 @@ class JwtService(
     }
 
     private fun extractAllClaims(token: String): Claims {
+        val extractedToken: String? = extractToken(token)
         val key: SecretKey = Keys.hmacShaKeyFor(Base64URL.from(secretKey).decode())
         return Jwts
             .parser()
             .verifyWith(key)
             .build()
-            .parseSignedClaims(token)
+            .parseSignedClaims(extractedToken)
             .payload
+    }
+
+    private fun extractToken(token: String): String? {
+        val regex = Regex("""\b[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\b""")
+        return regex.find(token)?.value
     }
 }
