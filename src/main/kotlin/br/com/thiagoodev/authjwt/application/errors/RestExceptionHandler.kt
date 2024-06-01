@@ -4,6 +4,8 @@ import br.com.thiagoodev.authjwt.infrastructure.exceptions.UserAlreadyExistsExce
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.validation.BindException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
@@ -15,15 +17,21 @@ class RestExceptionHandler {
         return ResponseErrorMessage(HttpStatus.BAD_REQUEST, message).build()
     }
 
-    @ExceptionHandler
-    fun userNotFoundException(exception: UsernameNotFoundException): ResponseEntity<ResponseErrorMessage> {
+    @ExceptionHandler(UsernameNotFoundException::class)
+    fun userNotFoundException(exception: RuntimeException): ResponseEntity<ResponseErrorMessage> {
         val message: String = exception.message ?: "User not found"
-        return ResponseErrorMessage(HttpStatus.BAD_REQUEST, message).build()
+        return ResponseErrorMessage(HttpStatus.NOT_FOUND, message).build()
     }
 
-    @ExceptionHandler
-    fun userAlreadyExistsException(exception: UserAlreadyExistsException): ResponseEntity<ResponseErrorMessage> {
+    @ExceptionHandler(UserAlreadyExistsException::class)
+    fun userAlreadyExistsException(exception: RuntimeException): ResponseEntity<ResponseErrorMessage> {
+        val message: String = exception.message ?: "User Already Exists"
+        return ResponseErrorMessage(HttpStatus.CONFLICT, message).build()
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun methodArgumentNotValidException(exception: BindException): ResponseEntity<ResponseErrorMessage> {
         val message: String = exception.message
-        return ResponseErrorMessage(HttpStatus.BAD_REQUEST, message).build()
+        return ResponseErrorMessage(HttpStatus.CONFLICT, message).build()
     }
 }
