@@ -1,8 +1,8 @@
 package br.com.thiagoodev.authjwt.infrastructure.services
 
+import com.nimbusds.jose.util.Base64URL
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
@@ -21,8 +21,10 @@ class JwtService(
 
     fun getExpiration(): Long = expiration
 
-    fun generateToken(details: UserDetails): String {
-        return buildToken(emptyMap(), details, expiration)
+    fun getRefreshExpiration(): Long = expiration + 1000 * 60 * 60 * 24 * 7
+
+    fun generateToken(details: UserDetails, newExpiration: Long? = null): String {
+        return buildToken(emptyMap(), details, newExpiration ?: expiration)
     }
 
     private fun buildToken(
@@ -40,21 +42,21 @@ class JwtService(
     }
 
     private fun getSignInKey(): Key {
-        val keyBytes: ByteArray = Decoders.BASE64.decode(secretKey)
+        val keyBytes: ByteArray = Base64URL.from(secretKey).decode()
         return Keys.hmacShaKeyFor(keyBytes)
     }
 
-    fun isTokenValid(token: String, details: UserDetails): Boolean {
+    fun isTokenValid(token: String, details: UserDetails, newExpiration: Long? = null): Boolean {
         val username: String = extractUsername(token)
-        return username == details.username && !isTokenExpired(token)
+        return username == details.username && !isTokenExpired(token, newExpiration)
     }
 
     fun extractUsername(token: String): String {
-        return extractClaim(token, Claims::getSubject)
+        return extractClaim(extractToken(token), Claims::getSubject)
     }
 
-    private fun isTokenExpired(token: String): Boolean {
-        return extractExpiration(token).before(Date())
+    private fun isTokenExpired(token: String, newExpiration: Long?): Boolean {
+        return extractExpiration(token).before(Date(newExpiration ?: expiration))
     }
 
     private fun extractExpiration(token: String): Date {
@@ -67,12 +69,18 @@ class JwtService(
     }
 
     private fun extractAllClaims(token: String): Claims {
-        val key: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(token))
+        val extractedToken: String? = extractToken(token)
+        val key: SecretKey = Keys.hmacShaKeyFor(Base64URL.from(secretKey).decode())
         return Jwts
             .parser()
             .verifyWith(key)
             .build()
-            .parseSignedClaims(token)
+            .parseSignedClaims(extractedToken)
             .payload
+    }
+
+    private fun extractToken(token: String): String? {
+        val regex = Regex("""\b[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\b""")
+        return regex.find(token)?.value
     }
 }

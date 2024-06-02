@@ -1,30 +1,29 @@
 package br.com.thiagoodev.authjwt.domain.entities
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
+import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity
 @Table(name = "users")
 data class User(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val uuid: String = "",
+    @field:GeneratedValue(strategy = GenerationType.UUID)
+    @field:UuidGenerator
+    val uuid: UUID = UUID.randomUUID(),
     val name: String = "",
-    @Column(unique = true)
+    @field:Column(unique = true)
     val email: String = "",
-    val userPassword: String = "",
-    @CreatedDate
+    @field:Column(name = "password")
+    val hashedPassword: String = "",
+    @field:CreatedDate
     val created: LocalDateTime = LocalDateTime.now(),
-    @LastModifiedDate
+    @field:LastModifiedDate
     val updated: LocalDateTime = LocalDateTime.now()
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
@@ -32,7 +31,7 @@ data class User(
     }
 
     override fun getPassword(): String {
-        return userPassword
+        return hashedPassword
     }
 
     override fun getUsername(): String {
