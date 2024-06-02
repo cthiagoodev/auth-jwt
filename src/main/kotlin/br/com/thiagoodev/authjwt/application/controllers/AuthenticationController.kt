@@ -1,6 +1,5 @@
 package br.com.thiagoodev.authjwt.application.controllers
 
-import br.com.thiagoodev.authjwt.application.errors.ResponseErrorMessage
 import br.com.thiagoodev.authjwt.domain.dtos.JwtDTO
 import br.com.thiagoodev.authjwt.domain.dtos.LoginUserDTO
 import br.com.thiagoodev.authjwt.domain.dtos.RegisterUserDTO
