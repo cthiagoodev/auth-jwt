@@ -31,10 +31,21 @@ class AuthenticationController(
     @PostMapping("/login")
     fun login(@Valid @RequestBody form: LoginUserDTO): ResponseEntity<JwtDTO> {
         val user: User = authenticationService.authentication(form)
-        val token: String = jwtService.generateToken(user)
+
         val expiration: Long = jwtService.getExpiration()
-        val response = JwtDTO(token, expiration)
+        val refreshExpiration: Long = jwtService.getRefreshExpiration()
+
+        val token: String = jwtService.generateToken(user)
+        val refreshToken: String = jwtService.generateToken(user, refreshExpiration)
+
+        val response = JwtDTO(token, refreshToken, expiration)
 
         return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(): ResponseEntity<JwtDTO> {
+        val email: String = jwtService.ex
+        val token: String = jwtService.generateToken()
     }
 }

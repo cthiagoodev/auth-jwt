@@ -1,5 +1,6 @@
 package br.com.thiagoodev.authjwt.application.errors
 
+import br.com.thiagoodev.authjwt.infrastructure.exceptions.InvalidFormException
 import br.com.thiagoodev.authjwt.infrastructure.exceptions.UserAlreadyExistsException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -27,6 +28,12 @@ class RestExceptionHandler {
     fun userAlreadyExistsException(exception: RuntimeException): ResponseEntity<ResponseErrorMessage> {
         val message: String = exception.message ?: "User Already Exists"
         return ResponseErrorMessage(HttpStatus.CONFLICT, message).build()
+    }
+
+    @ExceptionHandler(InvalidFormException::class)
+    fun invalidDataException(exception: RuntimeException): ResponseEntity<ResponseErrorMessage> {
+        val message: String = exception.message ?: "Invalid data"
+        return ResponseErrorMessage(HttpStatus.BAD_REQUEST, message).build()
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

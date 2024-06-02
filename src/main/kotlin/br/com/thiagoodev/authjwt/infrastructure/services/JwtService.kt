@@ -21,8 +21,10 @@ class JwtService(
 
     fun getExpiration(): Long = expiration
 
-    fun generateToken(details: UserDetails): String {
-        return buildToken(emptyMap(), details, expiration)
+    fun getRefreshExpiration(): Long = expiration + 1000 * 60 * 60 * 24 * 7
+
+    fun generateToken(details: UserDetails, newExpiration: Long? = null): String {
+        return buildToken(emptyMap(), details, newExpiration ?: expiration)
     }
 
     private fun buildToken(
@@ -44,17 +46,17 @@ class JwtService(
         return Keys.hmacShaKeyFor(keyBytes)
     }
 
-    fun isTokenValid(token: String, details: UserDetails): Boolean {
+    fun isTokenValid(token: String, details: UserDetails, newExpiration: Long? = null): Boolean {
         val username: String = extractUsername(token)
-        return username == details.username && !isTokenExpired(token)
+        return username == details.username && !isTokenExpired(token, newExpiration)
     }
 
     fun extractUsername(token: String): String {
         return extractClaim(extractToken(token), Claims::getSubject)
     }
 
-    private fun isTokenExpired(token: String): Boolean {
-        return extractExpiration(token).before(Date())
+    private fun isTokenExpired(token: String, newExpiration: Long?): Boolean {
+        return extractExpiration(token).before(Date(newExpiration ?: expiration))
     }
 
     private fun extractExpiration(token: String): Date {
