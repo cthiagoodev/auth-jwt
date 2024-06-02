@@ -31,7 +31,7 @@ class RestExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun methodArgumentNotValidException(exception: BindException): ResponseEntity<ResponseErrorMessage> {
-        val message: String = exception.message
+        val message: String = exception.fieldError?.defaultMessage ?: exception.message
         return ResponseErrorMessage(HttpStatus.CONFLICT, message).build()
     }
 }

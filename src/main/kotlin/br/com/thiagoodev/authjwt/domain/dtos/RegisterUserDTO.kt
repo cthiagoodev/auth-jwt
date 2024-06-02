@@ -9,12 +9,18 @@ data class RegisterUserDTO(
     @field:NotBlank(message = "Email is mandatory")
     @field:NotNull(message = "Email is mandatory")
     @field:Email(message = "Email should be valid")
-    val email: String,
+    val email: String?,
     @field:NotBlank(message = "Password is mandatory")
     @field:NotNull(message = "Password is mandatory")
     @field:Size(min = 6, message = "Password must be at least 6 characters long")
-    val password: String,
+    val password: String?,
     @field:NotBlank(message = "Username is mandatory")
     @field:NotNull(message = "Username is mandatory")
-    val fullName: String,
-)
+    val fullName: String?,
+) {
+    fun validate(): Boolean {
+        return !email.isNullOrEmpty() &&
+                !password.isNullOrEmpty() &&
+                !fullName.isNullOrEmpty()
+    }
+}
